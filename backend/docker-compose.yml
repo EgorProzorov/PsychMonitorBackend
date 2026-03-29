@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: psychmonitor
+      POSTGRES_USER: psychmonitor
+      POSTGRES_PASSWORD: psychmonitor_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://psychmonitor:psychmonitor_secret@db:5432/psychmonitor
+      DATABASE_URL_SYNC: postgresql://psychmonitor:psychmonitor_secret@db:5432/psychmonitor
+    depends_on:
+      - db
+    volumes:
+      - ./app:/app/app
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  pgdata:
