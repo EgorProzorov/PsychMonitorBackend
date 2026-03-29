@@ -2,8 +2,6 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-# --- Входящие данные с мобильного приложения ---
-
 class StressPointIn(BaseModel):
     ts: int
     value: int
@@ -34,11 +32,9 @@ class DailySummariesRequest(BaseModel):
     daily_summaries: list[DailySummaryIn]
 
 
-# --- Ответы ---
-
 class StressPointOut(BaseModel):
     id: int
-    ts: int
+    timestamp: int
     value: int
 
     class Config:
@@ -48,7 +44,7 @@ class StressPointOut(BaseModel):
 class HealthPointOut(BaseModel):
     id: int
     client_id: str
-    ts: int
+    timestamp: int
     hr: Optional[int]
     body_battery: Optional[int]
     stress_points: list[StressPointOut] = []
@@ -60,7 +56,7 @@ class HealthPointOut(BaseModel):
 class DailySummaryOut(BaseModel):
     id: int
     client_id: str
-    ts: int
+    timestamp: int
     steps: Optional[int]
     calories: Optional[int]
     distance: Optional[int]

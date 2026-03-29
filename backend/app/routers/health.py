@@ -17,23 +17,21 @@ async def receive_health_points(
     sp_count = 0
 
     for hp_in in request.health_points:
-        # Сохраняем health_point
         hp = HealthPoint(
             client_id=hp_in.client_id,
-            ts=hp_in.ts,
+            timestamp=hp_in.ts,
             hr=hp_in.hr,
             body_battery=hp_in.body_battery,
         )
         db.add(hp)
-        await db.flush()  # получаем hp.id
+        await db.flush()
         hp_count += 1
 
-        # Сохраняем связанные stress_points
         for sp_in in hp_in.stress_points:
             sp = StressPoint(
                 client_id=hp_in.client_id,
                 health_point_id=hp.id,
-                ts=sp_in.ts,
+                timestamp=sp_in.ts,
                 value=sp_in.value,
             )
             db.add(sp)

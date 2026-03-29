@@ -12,7 +12,7 @@ class HealthPoint(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(String, nullable=False, index=True)
-    ts = Column(BigInteger, nullable=False)  # unix timestamp
+    timestamp = Column(BigInteger, nullable=False)
     hr = Column(Integer, nullable=True)
     body_battery = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -20,7 +20,7 @@ class HealthPoint(Base):
     stress_points = relationship("StressPoint", back_populates="health_point")
 
     __table_args__ = (
-        Index("ix_health_points_client_ts", "client_id", "ts"),
+        Index("ix_health_points_client_ts", "client_id", "timestamp"),
     )
 
 
@@ -30,30 +30,30 @@ class StressPoint(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(String, nullable=False, index=True)
     health_point_id = Column(Integer, ForeignKey("health_points.id"), nullable=True)
-    ts = Column(BigInteger, nullable=False)  # unix timestamp
+    timestamp = Column(BigInteger, nullable=False)
     value = Column(Integer, nullable=False)
 
     health_point = relationship("HealthPoint", back_populates="stress_points")
 
     __table_args__ = (
-        Index("ix_stress_points_client_ts", "client_id", "ts"),
+        Index("ix_stress_points_client_ts", "client_id", "timestamp"),
     )
 
 
-class DailySummary(Base):
-    __tablename__ = "daily_summaries"
+class AdditionalDailyInfo(Base):
+    __tablename__ = "additional_daily_info"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(String, nullable=False, index=True)
-    ts = Column(BigInteger, nullable=False)
+    timestamp = Column(BigInteger, nullable=False)
     steps = Column(Integer, nullable=True)
     calories = Column(Integer, nullable=True)
-    distance = Column(Integer, nullable=True)  # в сантиметрах
+    distance = Column(Integer, nullable=True)
     active_minutes = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
-        Index("ix_daily_summaries_client_ts", "client_id", "ts"),
+        Index("ix_additional_daily_info_client_ts", "client_id", "timestamp"),
     )
 
 
@@ -76,10 +76,10 @@ class DailyAnalytics(Base):
     stress_min = Column(Integer, nullable=True)
     stress_max = Column(Integer, nullable=True)
 
-    stress_rest_min = Column(Integer, nullable=True, default=0)
-    stress_low_min = Column(Integer, nullable=True, default=0)
-    stress_med_min = Column(Integer, nullable=True, default=0)
-    stress_high_min = Column(Integer, nullable=True, default=0)
+    stress_rest_time = Column(Integer, nullable=True, default=0)
+    stress_low_time = Column(Integer, nullable=True, default=0)
+    stress_med_time = Column(Integer, nullable=True, default=0)
+    stress_high_time = Column(Integer, nullable=True, default=0)
 
     steps = Column(Integer, nullable=True)
     calories = Column(Integer, nullable=True)

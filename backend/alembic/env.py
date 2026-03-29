@@ -15,8 +15,7 @@ if db_url:
 
 # Импортируем модели чтобы Alembic их видел
 from app.database import Base
-from app.models import HealthPoint, StressPoint, DailySummary, DailyAnalytics  # noqa
-
+from app.models import HealthPoint, StressPoint, AdditionalDailyInfo, DailyAnalytics  # noqa
 target_metadata = Base.metadata
 
 
