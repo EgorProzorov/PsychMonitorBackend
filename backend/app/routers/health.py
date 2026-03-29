@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,6 +8,9 @@ from app.schemas import HealthPointsRequest, StatusResponse
 
 router = APIRouter(prefix="/api", tags=["health"])
 
+
+def ts_to_datetime(ts: int) -> datetime:
+    return datetime.utcfromtimestamp(ts)
 
 @router.post("/health-points", response_model=StatusResponse)
 async def receive_health_points(
@@ -19,7 +23,7 @@ async def receive_health_points(
     for hp_in in request.health_points:
         hp = HealthPoint(
             client_id=hp_in.client_id,
-            timestamp=hp_in.ts,
+            timestamp=ts_to_datetime(hp_in.ts),
             hr=hp_in.hr,
             body_battery=hp_in.body_battery,
         )
@@ -31,7 +35,7 @@ async def receive_health_points(
             sp = StressPoint(
                 client_id=hp_in.client_id,
                 health_point_id=hp.id,
-                timestamp=sp_in.ts,
+                timestamp=ts_to_datetime(sp_in.ts),
                 value=sp_in.value,
             )
             db.add(sp)
@@ -44,3 +48,62 @@ async def receive_health_points(
         saved_health_points=hp_count,
         saved_stress_points=sp_count,
     )
+
+
+"""
+Данные для теста
+{
+  "health_points": [
+    {
+      "client_id": "test-client-001",
+      "ts": 1743282000,
+      "hr": 72,
+      "body_battery": 85,
+      "stress_points": [
+        {"ts": 1743281880, "value": 22},
+        {"ts": 1743282060, "value": 28}
+      ]
+    },
+    {
+      "client_id": "test-client-001",
+      "ts": 1743282300,
+      "hr": 78,
+      "body_battery": 82,
+      "stress_points": [
+        {"ts": 1743282180, "value": 35},
+        {"ts": 1743282360, "value": 42}
+      ]
+    },
+    {
+      "client_id": "test-client-001",
+      "ts": 1743282600,
+      "hr": 95,
+      "body_battery": 74,
+      "stress_points": [
+        {"ts": 1743282480, "value": 68},
+        {"ts": 1743282660, "value": 78}
+      ]
+    },
+    {
+      "client_id": "test-client-001",
+      "ts": 1743282900,
+      "hr": 125,
+      "body_battery": 65,
+      "stress_points": [
+        {"ts": 1743282780, "value": 82},
+        {"ts": 1743282960, "value": 91}
+      ]
+    },
+    {
+      "client_id": "test-client-001",
+      "ts": 1743283200,
+      "hr": 68,
+      "body_battery": 70,
+      "stress_points": [
+        {"ts": 1743283080, "value": 45},
+        {"ts": 1743283260, "value": 18}
+      ]
+    }
+  ]
+}
+"""

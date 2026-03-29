@@ -11,11 +11,8 @@ async def build_daily_analytics(
     target_date: date,
 ) -> DailyAnalytics:
 
-    day_start = int(datetime.combine(target_date, datetime.min.time(),
-                                      tzinfo=timezone.utc).timestamp())
-    day_end = int(datetime.combine(target_date + timedelta(days=1),
-                                    datetime.min.time(),
-                                    tzinfo=timezone.utc).timestamp())
+    day_start = datetime.combine(target_date, datetime.min.time())
+    day_end = datetime.combine(target_date + timedelta(days=1), datetime.min.time())
 
     # HR и Body Battery
     hp_result = await db.execute(

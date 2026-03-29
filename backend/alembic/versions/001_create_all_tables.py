@@ -19,7 +19,7 @@ def upgrade() -> None:
         "health_points",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
         sa.Column("client_id", sa.String, nullable=False, index=True),
-        sa.Column("timestamp", sa.BigInteger, nullable=False),
+        sa.Column("timestamp", sa.DateTime, nullable=False),
         sa.Column("hr", sa.Integer, nullable=True),
         sa.Column("body_battery", sa.Integer, nullable=True),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now()),
@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
         sa.Column("client_id", sa.String, nullable=False, index=True),
         sa.Column("health_point_id", sa.Integer, sa.ForeignKey("health_points.id"), nullable=True),
-        sa.Column("timestamp", sa.BigInteger, nullable=False),
+        sa.Column("timestamp", sa.DateTime, nullable=False),
         sa.Column("value", sa.Integer, nullable=False),
     )
     op.create_index("ix_stress_points_client_ts", "stress_points", ["client_id", "timestamp"])
@@ -40,7 +40,7 @@ def upgrade() -> None:
         "additional_daily_info",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
         sa.Column("client_id", sa.String, nullable=False, index=True),
-        sa.Column("timestamp", sa.BigInteger, nullable=False),
+        sa.Column("timestamp", sa.DateTime, nullable=False),
         sa.Column("steps", sa.Integer, nullable=True),
         sa.Column("calories", sa.Integer, nullable=True),
         sa.Column("distance", sa.Integer, nullable=True),

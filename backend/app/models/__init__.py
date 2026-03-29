@@ -12,7 +12,7 @@ class HealthPoint(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(String, nullable=False, index=True)
-    timestamp = Column(BigInteger, nullable=False)
+    timestamp = Column(DateTime, nullable=False)
     hr = Column(Integer, nullable=True)
     body_battery = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -30,7 +30,7 @@ class StressPoint(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(String, nullable=False, index=True)
     health_point_id = Column(Integer, ForeignKey("health_points.id"), nullable=True)
-    timestamp = Column(BigInteger, nullable=False)
+    timestamp = Column(DateTime, nullable=False)
     value = Column(Integer, nullable=False)
 
     health_point = relationship("HealthPoint", back_populates="stress_points")
@@ -45,7 +45,7 @@ class AdditionalDailyInfo(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(String, nullable=False, index=True)
-    timestamp = Column(BigInteger, nullable=False)
+    timestamp = Column(DateTime, nullable=False)
     steps = Column(Integer, nullable=True)
     calories = Column(Integer, nullable=True)
     distance = Column(Integer, nullable=True)

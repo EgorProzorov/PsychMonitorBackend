@@ -10,6 +10,9 @@ from app.services import build_daily_analytics
 router = APIRouter(prefix="/api", tags=["daily"])
 
 
+def ts_to_datetime(ts: int) -> datetime:
+    return datetime.utcfromtimestamp(ts)
+
 @router.post("/daily-summaries", response_model=StatusResponse)
 async def receive_daily_summaries(
     request: DailySummariesRequest,
@@ -20,7 +23,7 @@ async def receive_daily_summaries(
     for ds_in in request.daily_summaries:
         ds = AdditionalDailyInfo(
             client_id=ds_in.client_id,
-            timestamp=ds_in.ts,
+            timestamp=ts_to_datetime(ds_in.ts),
             steps=ds_in.steps,
             calories=ds_in.calories,
             distance=ds_in.distance_cm,
@@ -32,7 +35,7 @@ async def receive_daily_summaries(
     await db.commit()
 
     for ds_in in request.daily_summaries:
-        target_date = datetime.fromtimestamp(ds_in.ts, tz=timezone.utc).date()
+        target_date = ts_to_datetime(ds_in.ts).date()
         analytics = await build_daily_analytics(db, ds_in.client_id, target_date)
         print(f"=== daily_analytics for {ds_in.client_id} on {target_date}: "
               f"hr_avg={analytics.hr_avg} stress_avg={analytics.stress_avg} "
@@ -42,3 +45,19 @@ async def receive_daily_summaries(
         status="ok",
         saved_daily_summaries=count,
     )
+
+"""
+Данные для теста
+{
+  "daily_summaries": [
+    {
+      "client_id": "test-client-001",
+      "ts": 1743289200,
+      "steps": 8432,
+      "calories": 1850,
+      "distance_cm": 650000,
+      "active_minutes": 45
+    }
+  ]
+}
+"""
