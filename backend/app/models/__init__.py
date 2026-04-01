@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from sqlalchemy import (
     Column, Integer, BigInteger, Float, String, Date, DateTime,
-    ForeignKey, Index
+    ForeignKey, Index, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -34,9 +34,9 @@ class StressPoint(Base):
     value = Column(Integer, nullable=False)
 
     health_point = relationship("HealthPoint", back_populates="stress_points")
-
     __table_args__ = (
         Index("ix_stress_points_client_ts", "client_id", "timestamp"),
+        UniqueConstraint("client_id", "timestamp", name="uq_stress_client_ts"),
     )
 
 

@@ -21,6 +21,11 @@ async def receive_health_points(
     sp_count = 0
 
     for hp_in in request.health_points:
+        # Пропускаем пустые точки
+        if hp_in.hr is None and hp_in.body_battery is None:
+            continue
+
+    for hp_in in request.health_points:
         hp = HealthPoint(
             client_id=hp_in.client_id,
             timestamp=ts_to_datetime(hp_in.ts),
