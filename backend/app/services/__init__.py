@@ -139,9 +139,9 @@ async def build_daily_analytics(
 
 
 # ── Конфигурация детекции стресс-эпизодов ──
-STRESS_THRESHOLD = 51          # порог: значение >= этого = повышенный стресс
+STRESS_THRESHOLD = 75          # порог: значение >= этого = повышенный стресс
 MIN_CONSECUTIVE_POINTS = 2     # сколько точек подряд для открытия эпизода
-MIN_EPISODE_DURATION_MIN = 30  # минимальная длительность (минуты) для сохранения
+MIN_EPISODE_DURATION_MIN = 1  # минимальная длительность (минуты) для сохранения
 
 
 async def process_stress_realtime(

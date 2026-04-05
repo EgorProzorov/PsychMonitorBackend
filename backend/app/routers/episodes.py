@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models import StressEpisode
-from app.schemas import StressEpisodeOut, EpisodeCommentIn
+from app.schemas import StressEpisodeOut
 from app.routers.verify_token import verify_token
 
 router = APIRouter(prefix="/api", tags=["episodes"])
