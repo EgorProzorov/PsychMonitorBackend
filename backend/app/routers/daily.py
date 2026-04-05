@@ -7,6 +7,8 @@ from app.models import AdditionalDailyInfo
 from app.schemas import DailySummariesRequest, StatusResponse
 from app.services import build_daily_analytics
 
+from app.routers.verify_token import verify_token
+
 router = APIRouter(prefix="/api", tags=["daily"])
 
 
@@ -16,7 +18,8 @@ def ts_to_datetime(ts: int) -> datetime:
 @router.post("/daily-summaries", response_model=StatusResponse)
 async def receive_daily_summaries(
     request: DailySummariesRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    _=Depends(verify_token)
 ):
     count = 0
 

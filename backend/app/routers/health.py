@@ -6,6 +6,8 @@ from app.database import get_db
 from app.models import HealthPoint, StressPoint
 from app.schemas import HealthPointsRequest, StatusResponse
 
+from app.routers.verify_token import verify_token
+
 router = APIRouter(prefix="/api", tags=["health"])
 
 
@@ -15,7 +17,8 @@ def ts_to_datetime(ts: int) -> datetime:
 @router.post("/health-points", response_model=StatusResponse)
 async def receive_health_points(
     request: HealthPointsRequest,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    _=Depends(verify_token)
 ):
     hp_count = 0
     sp_count = 0
