@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import health, daily
+from app.routers import health, daily, episodes
 
 app = FastAPI(
     title="PsychMonitor API",
@@ -9,6 +9,7 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(daily.router)
+app.include_router(episodes.router)
 
 
 @app.get("/")

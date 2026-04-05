@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models import HealthPoint, StressPoint
 from app.schemas import HealthPointsRequest, StatusResponse
+from app.services import process_stress_realtime
 
 from app.routers.verify_token import verify_token
 
@@ -50,6 +51,15 @@ async def receive_health_points(
             sp_count += 1
 
     await db.commit()
+
+    # Реалтайм-детекция стресс-эпизодов для каждого клиента
+    client_ids = set(hp_in.client_id for hp_in in request.health_points)
+    episode_results = []
+    for cid in client_ids:
+        ep_result = await process_stress_realtime(db, cid)
+        if ep_result["action"] != "none":
+            episode_results.append(ep_result)
+            print(f"=== stress episode: {ep_result} ===")
 
     return StatusResponse(
         status="ok",
