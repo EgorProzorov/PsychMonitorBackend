@@ -141,7 +141,7 @@ async def build_daily_analytics(
 # ── Конфигурация детекции стресс-эпизодов ──
 STRESS_THRESHOLD = 75          # порог: значение >= этого = повышенный стресс
 MIN_CONSECUTIVE_POINTS = 2     # сколько точек подряд для открытия эпизода
-MIN_EPISODE_DURATION_MIN = 1  # минимальная длительность (минуты) для сохранения
+MIN_EPISODE_DURATION_MIN = 30  # минимальная длительность (минуты) для сохранения
 
 
 async def process_stress_realtime(
@@ -209,9 +209,25 @@ async def process_stress_realtime(
             all_above = all(p.value >= stress_threshold for p in last_n)
 
             if all_above:
-                # Открываем новый эпизод
-                episode_start = last_n[0].timestamp
-                stress_values = [p.value for p in last_n]
+                # Ищем начало непрерывной серии >= порога (идём назад от последней точки)
+                all_pts_result = await db.execute(
+                    select(StressPoint)
+                    .where(StressPoint.client_id == client_id)
+                    .order_by(StressPoint.timestamp.desc())
+                )
+                all_pts = list(all_pts_result.scalars().all())
+
+                episode_start = all_pts[0].timestamp
+                for p in all_pts:
+                    if p.value >= stress_threshold:
+                        episode_start = p.timestamp
+                    else:
+                        break
+
+                stress_values = [
+                    p.value for p in all_pts
+                    if p.value >= stress_threshold and p.timestamp >= episode_start
+                ]
 
                 new_episode = StressEpisode(
                     client_id=client_id,

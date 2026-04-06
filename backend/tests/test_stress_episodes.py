@@ -19,9 +19,8 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import event
 
-from app.database import Base, get_db, engine
+from app.database import Base, get_db
 from app.main import app
-from app.models import StressEpisode
 
 # Тестовый engine (SQLite)
 test_engine = create_async_engine("sqlite+aiosqlite:///./test_episodes.db", echo=False)
@@ -82,7 +81,7 @@ async def test_episode_opens_after_consecutive_high_stress():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         resp = await client.post(
             "/api/health-points",
-            json=make_payload([60, 65], BASE_TS),
+            json=make_payload([75, 80], BASE_TS),
             headers=AUTH_HEADERS,
         )
         assert resp.status_code == 200
@@ -94,7 +93,7 @@ async def test_episode_opens_after_consecutive_high_stress():
         assert resp.status_code == 200
         ep = resp.json()
         assert ep["ended_at"] is None
-        assert ep["peak_stress"] >= 60
+        assert ep["peak_stress"] >= 75
 
 
 @pytest.mark.asyncio
@@ -104,7 +103,7 @@ async def test_no_episode_on_single_high_point():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         resp = await client.post(
             "/api/health-points",
-            json=make_payload([60], BASE_TS),
+            json=make_payload([80], BASE_TS),
             headers=AUTH_HEADERS,
         )
         assert resp.status_code == 200
@@ -123,7 +122,7 @@ async def test_episode_closes_on_low_stress():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         await client.post(
             "/api/health-points",
-            json=make_payload([60, 65], BASE_TS),
+            json=make_payload([80, 85], BASE_TS),
             headers=AUTH_HEADERS,
         )
         await client.post(
@@ -146,7 +145,7 @@ async def test_short_episode_discarded():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         await client.post(
             "/api/health-points",
-            json=make_payload([60, 65], BASE_TS, interval_sec=60),
+            json=make_payload([80, 85], BASE_TS, interval_sec=60),
             headers=AUTH_HEADERS,
         )
         await client.post(
@@ -169,15 +168,15 @@ async def test_long_episode_kept():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         # 35 точек × 1 мин = 34 минуты
-        values = [60 + (i % 20) for i in range(35)]
+        values = [80] * 12
         await client.post(
             "/api/health-points",
-            json=make_payload(values, BASE_TS, interval_sec=60),
+            json=make_payload(values, BASE_TS, interval_sec=180),
             headers=AUTH_HEADERS,
         )
         await client.post(
             "/api/health-points",
-            json=make_payload([30], BASE_TS + 35 * 60),
+            json=make_payload([30], BASE_TS + 12 * 180),
             headers=AUTH_HEADERS,
         )
 
@@ -198,7 +197,7 @@ async def test_update_comment_and_status():
     """PATCH обновляет описание и статус."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        values = [70] * 35
+        values = [80] * 35
         await client.post(
             "/api/health-points",
             json=make_payload(values, BASE_TS, interval_sec=60),
