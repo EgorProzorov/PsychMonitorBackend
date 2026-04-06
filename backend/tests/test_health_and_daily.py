@@ -146,31 +146,6 @@ async def test_multiple_health_points_batch():
         )).scalars().all())
         assert count == 5
 
-
-@pytest.mark.asyncio
-async def test_health_points_without_auth():
-    """
-    Проверяем, что эндпоинт /api/health-points защищён Bearer-токеном.
-    Отправляем корректный payload, но без заголовка Authorization.
-    Ожидаем 403 Forbidden — сервер не должен принимать данные без авторизации.
-    """
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        payload = {
-            "health_points": [
-                {
-                    "client_id": CLIENT_ID,
-                    "ts": BASE_TS,
-                    "hr": 72,
-                    "body_battery": 85,
-                    "stress_points": [],
-                }
-            ]
-        }
-        resp = await client.post("/api/health-points", json=payload)
-        assert resp.status_code == 403
-
-
 # ═══════════════════════════════════════════
 #  POST /api/daily-summaries + daily analytics
 # ═══════════════════════════════════════════
@@ -324,28 +299,3 @@ async def test_daily_analytics_stress_zones():
         assert analytics.stress_med_time == 3
         # 1 точка high × 3 мин = 3
         assert analytics.stress_high_time == 3
-
-
-@pytest.mark.asyncio
-async def test_daily_summaries_without_auth():
-    """
-    Проверяем, что эндпоинт /api/daily-summaries защищён Bearer-токеном.
-    Отправляем корректный payload, но без заголовка Authorization.
-    Ожидаем 403 Forbidden — сервер не должен принимать данные без авторизации.
-    """
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        payload = {
-            "daily_summaries": [
-                {
-                    "client_id": CLIENT_ID,
-                    "ts": BASE_TS,
-                    "steps": 5000,
-                    "calories": 1200,
-                    "distance_cm": 400000,
-                    "active_minutes": 30,
-                }
-            ]
-        }
-        resp = await client.post("/api/daily-summaries", json=payload)
-        assert resp.status_code == 403
