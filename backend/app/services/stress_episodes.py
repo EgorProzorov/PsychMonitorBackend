@@ -7,7 +7,7 @@ from app.models import HealthPoint, StressPoint, StressEpisode
 # ── Конфигурация детекции стресс-эпизодов ──
 STRESS_THRESHOLD = 75          # порог: значение >= этого = повышенный стресс
 MIN_CONSECUTIVE_POINTS = 2     # сколько точек подряд для открытия эпизода
-MIN_EPISODE_DURATION_MIN = 30  # минимальная длительность (минуты) для сохранения
+MIN_EPISODE_DURATION_MIN = 6  # минимальная длительность (минуты) для сохранения
 
 
 async def process_stress_realtime(
@@ -190,8 +190,9 @@ async def _close_episode(
 
     if duration < min_duration_minutes:
         # Слишком короткий — удаляем
-        await db.delete(episode)
-        await db.commit()
+        # await db.delete(episode)
+        # await db.commit()
+        # не удаляем, а просто не аллертим клиена ою этом эпизоде, хранить его будем
         return {"action": "episode_discarded", "episode_id": episode.id, "duration_minutes": round(duration, 1)}
     else:
         # Сохраняем — готов к пуш-уведомлению
