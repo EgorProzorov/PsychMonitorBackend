@@ -1,98 +1,16 @@
-from pydantic import BaseModel
-from typing import Optional
+# Реэкспорт всех схем для обратной совместимости импортов
+from app.schemas.common import StatusResponse
+from app.schemas.health import (
+    StressPointIn, HealthPointIn, HealthPointsRequest,
+    StressPointOut, HealthPointOut,
+)
+from app.schemas.daily import DailySummaryIn, DailySummariesRequest, DailySummaryOut
+from app.schemas.episodes import StressEpisodeOut, EpisodeDetectionConfig
 
-
-class StressPointIn(BaseModel):
-    ts: int
-    value: int
-
-
-class HealthPointIn(BaseModel):
-    client_id: str
-    ts: int
-    hr: Optional[int] = None
-    body_battery: Optional[int] = None
-    stress_points: list[StressPointIn] = []
-
-
-class HealthPointsRequest(BaseModel):
-    health_points: list[HealthPointIn]
-
-
-class DailySummaryIn(BaseModel):
-    client_id: str
-    ts: int
-    steps: Optional[int] = None
-    calories: Optional[int] = None
-    distance_cm: Optional[int] = None
-    active_minutes: Optional[int] = None
-
-
-class DailySummariesRequest(BaseModel):
-    daily_summaries: list[DailySummaryIn]
-
-
-class StressPointOut(BaseModel):
-    id: int
-    timestamp: int
-    value: int
-
-    class Config:
-        from_attributes = True
-
-
-class HealthPointOut(BaseModel):
-    id: int
-    client_id: str
-    timestamp: int
-    hr: Optional[int]
-    body_battery: Optional[int]
-    stress_points: list[StressPointOut] = []
-
-    class Config:
-        from_attributes = True
-
-
-class DailySummaryOut(BaseModel):
-    id: int
-    client_id: str
-    timestamp: int
-    steps: Optional[int]
-    calories: Optional[int]
-    distance: Optional[int]
-    active_minutes: Optional[int]
-
-    class Config:
-        from_attributes = True
-
-
-class StatusResponse(BaseModel):
-    status: str
-    saved_health_points: int = 0
-    saved_stress_points: int = 0
-    saved_daily_summaries: int = 0
-
-
-# ── Stress Episodes ──
-
-class StressEpisodeOut(BaseModel):
-    id: int
-    client_id: str
-    started_at: str
-    ended_at: Optional[str]
-    duration_minutes: Optional[float]
-    peak_stress: int
-    peak_hr: Optional[int]
-    avg_hr: Optional[float]
-    avg_stress: float
-    user_description: Optional[str]
-    approved_status: str
-
-    class Config:
-        from_attributes = True
-
-
-class EpisodeDetectionConfig(BaseModel):
-    stress_threshold: int = 51
-    min_consecutive_points: int = 2
-    min_duration_minutes: int = 30
+__all__ = [
+    "StatusResponse",
+    "StressPointIn", "HealthPointIn", "HealthPointsRequest",
+    "StressPointOut", "HealthPointOut",
+    "DailySummaryIn", "DailySummariesRequest", "DailySummaryOut",
+    "StressEpisodeOut", "EpisodeDetectionConfig",
+]
