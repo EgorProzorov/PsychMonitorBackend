@@ -15,15 +15,15 @@ import pytest
 import pytest_asyncio
 from datetime import datetime
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy import event, select
 
-from app.database import Base, get_db
+from app.database import Base, get_db, override_engine
 from app.main import app
 from app.models import HealthPoint, StressPoint, AdditionalDailyInfo, DailyAnalytics
 
 # Тестовый engine (SQLite)
-test_engine = create_async_engine("sqlite+aiosqlite:///./test_health_daily.db", echo=False)
+test_engine = override_engine("sqlite+aiosqlite:///./test_health_daily.db")
 test_session = async_sessionmaker(test_engine, expire_on_commit=False)
 
 

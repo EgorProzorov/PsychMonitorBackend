@@ -14,7 +14,7 @@ class HealthPoint(Base):
     timestamp = Column(DateTime, nullable=False)
     hr = Column(Integer, nullable=True)
     body_battery = Column(Integer, nullable=True)
-    created_at = Column(DateTime, default=datetime.now(TIMEZONE))
+    created_at = Column(DateTime, default=lambda: datetime.now(TIMEZONE).replace(tzinfo=None))
 
     stress_points = relationship("StressPoint", back_populates="health_point")
 

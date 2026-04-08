@@ -19,7 +19,7 @@ class StressEpisode(Base):
     avg_stress = Column(Float, nullable=False)
     user_description = Column(Text, nullable=True)
     approved_status = Column(String, nullable=False, default="pending")
-    created_at = Column(DateTime, default=datetime.now(TIMEZONE))
+    created_at = Column(DateTime, default=lambda: datetime.now(TIMEZONE).replace(tzinfo=None))
 
     __table_args__ = (
         Index("ix_stress_episodes_client_started", "client_id", "started_at"),

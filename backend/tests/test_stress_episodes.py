@@ -16,14 +16,14 @@ import pytest
 import pytest_asyncio
 from datetime import datetime
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy import event
 
-from app.database import Base, get_db
+from app.database import Base, get_db, override_engine
 from app.main import app
 
 # Тестовый engine (SQLite)
-test_engine = create_async_engine("sqlite+aiosqlite:///./test_episodes.db", echo=False)
+test_engine = override_engine("sqlite+aiosqlite:///./test_episodes.db")
 test_session = async_sessionmaker(test_engine, expire_on_commit=False)
 
 
@@ -140,7 +140,7 @@ async def test_episode_closes_on_low_stress():
 
 @pytest.mark.asyncio
 async def test_short_episode_discarded():
-    """Эпизод < 30 мин удаляется."""
+    """Короткий эпизод < MIN_EPISODE_DURATION_MIN сохраняется в БД, но закрыт и не активен."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         await client.post(
@@ -154,12 +154,23 @@ async def test_short_episode_discarded():
             headers=AUTH_HEADERS,
         )
 
+        # Эпизод хранится, но закрыт (не активен)
         resp = await client.get(
             f"/api/stress-episodes/{CLIENT_ID}",
             headers=AUTH_HEADERS,
         )
         assert resp.status_code == 200
-        assert len(resp.json()) == 0
+        episodes = resp.json()
+        assert len(episodes) == 1
+        assert episodes[0]["ended_at"] is not None
+        assert episodes[0]["duration_minutes"] < 6  # меньше MIN_EPISODE_DURATION_MIN
+
+        # Но активного эпизода нет
+        resp = await client.get(
+            f"/api/stress-episodes/{CLIENT_ID}/active",
+            headers=AUTH_HEADERS,
+        )
+        assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
