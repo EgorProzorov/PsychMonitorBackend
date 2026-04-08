@@ -1,13 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import STRESS_THRESHOLD, MIN_CONSECUTIVE_POINTS, MIN_EPISODE_DURATION_MIN
 from app.models import HealthPoint, StressPoint, StressEpisode
-
-
-# ── Конфигурация детекции стресс-эпизодов ──
-STRESS_THRESHOLD = 75          # порог: значение >= этого = повышенный стресс
-MIN_CONSECUTIVE_POINTS = 2     # сколько точек подряд для открытия эпизода
-MIN_EPISODE_DURATION_MIN = 6  # минимальная длительность (минуты) для сохранения
 
 
 async def process_stress_realtime(

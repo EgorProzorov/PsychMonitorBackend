@@ -1,5 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, Float, String, Text, DateTime, Index
+
+from app.config import TIMEZONE
 from app.database import Base
 
 
@@ -17,7 +19,7 @@ class StressEpisode(Base):
     avg_stress = Column(Float, nullable=False)
     user_description = Column(Text, nullable=True)
     approved_status = Column(String, nullable=False, default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(TIMEZONE))
 
     __table_args__ = (
         Index("ix_stress_episodes_client_started", "client_id", "started_at"),

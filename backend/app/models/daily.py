@@ -1,5 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, Float, String, Date, DateTime, Index
+
+from app.config import TIMEZONE
 from app.database import Base
 
 
@@ -13,7 +15,7 @@ class AdditionalDailyInfo(Base):
     calories = Column(Integer, nullable=True)
     distance = Column(Integer, nullable=True)
     active_minutes = Column(Integer, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(TIMEZONE))
 
     __table_args__ = (
         Index("ix_additional_daily_info_client_ts", "client_id", "timestamp"),
@@ -50,7 +52,7 @@ class DailyAnalytics(Base):
     active_minutes = Column(Integer, nullable=True)
 
     anomalies_count = Column(Integer, nullable=True, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(TIMEZONE))
 
     __table_args__ = (
         Index("ix_daily_analytics_client_date", "client_id", "date", unique=True),

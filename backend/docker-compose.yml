@@ -25,6 +25,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://psychmonitor:psychmonitor_secret@db:5432/psychmonitor
       DATABASE_URL_SYNC: postgresql://psychmonitor:psychmonitor_secret@db:5432/psychmonitor
       API_TOKEN: "ZVPh4lTdX8vatKjLiCYaIGMtWboSkMZiMZM1LJ061O03wSr0VA4CimDTZZ69L1zB"
+
     depends_on:
       db:
         condition: service_healthy

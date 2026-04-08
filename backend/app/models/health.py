@@ -1,6 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, Float, String, DateTime, Index
 from sqlalchemy.orm import relationship
+
+from app.config import TIMEZONE
 from app.database import Base
 
 
@@ -12,7 +14,7 @@ class HealthPoint(Base):
     timestamp = Column(DateTime, nullable=False)
     hr = Column(Integer, nullable=True)
     body_battery = Column(Integer, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(TIMEZONE))
 
     stress_points = relationship("StressPoint", back_populates="health_point")
 
